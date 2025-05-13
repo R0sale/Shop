@@ -22,7 +22,7 @@ namespace ProductService.Extensions
         {
             service.AddDbContext<ProductRepositoryContext>(opt =>
             {
-                opt.UseSqlServer(configuration.GetConnectionString("sqlConnection"));
+                opt.UseSqlServer(configuration.GetConnectionString("sqlConnection"), b => b.MigrationsAssembly("ProductService"));
             });
         }
     }

@@ -18,8 +18,6 @@ namespace ProductService.Controllers
         [HttpGet(Name = "Products")]
         public async Task<IActionResult> GetAllProducts()
         {
-            throw new Exception("CHlen");
-
             var products = await _service.ProductService.GetAllProductsAsync(false);
 
             return Ok(products);
