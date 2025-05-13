@@ -4,6 +4,7 @@ using Service.Contracts;
 using Shared.DTOObjects;
 using System.ComponentModel.Design;
 using Microsoft.AspNetCore.JsonPatch;
+using ProductService.ActionFilters;
 
 namespace ProductService.Controllers
 {
@@ -35,14 +36,9 @@ namespace ProductService.Controllers
         }
 
         [HttpPost]
+        [ServiceFilter(typeof(ValidationFilterAttribute))]
         public async Task<IActionResult> CreateProduct([FromBody] ProductForCreationDTO productForCreation)
         {
-            if (productForCreation == null)
-                return BadRequest("ProductForCreation is null");
-
-            if (!ModelState.IsValid)
-                return UnprocessableEntity(ModelState);
-
             var productDTO = await _service.ProductService.CreateProduct(productForCreation);
 
             return CreatedAtRoute("ProductById", new { id = productDTO.Id }, productDTO);
@@ -57,14 +53,9 @@ namespace ProductService.Controllers
         }
 
         [HttpPut("{id:guid}")]
+        [ServiceFilter(typeof(ValidationFilterAttribute))]
         public async Task<IActionResult> UpdateProduct(Guid id, [FromBody] ProductForUpdateDTO productForUpd)
         {
-            if (productForUpd == null)
-                return BadRequest("ProductForUpdate is null");
-
-            if (!ModelState.IsValid)
-                return UnprocessableEntity(ModelState);
-
             await _service.ProductService.UpdateProduct(id, productForUpd, true);
 
             return NoContent();
