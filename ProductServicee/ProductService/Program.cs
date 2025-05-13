@@ -12,6 +12,8 @@ builder.Services.AddControllers();
 
 var app = builder.Build();
 
+app.ConfigureExceptionHandler();
+
 if (app.Environment.IsProduction())
     app.UseHsts();
 
