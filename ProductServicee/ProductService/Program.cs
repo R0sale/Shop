@@ -8,7 +8,8 @@ builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.ConfigureServiceManager();
 builder.Services.ConfigureSqlContext(builder.Configuration);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddNewtonsoftJson();
 
 var app = builder.Build();
 
