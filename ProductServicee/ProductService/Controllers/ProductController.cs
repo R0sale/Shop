@@ -4,6 +4,7 @@ using Service.Contracts;
 using Shared.DTOObjects;
 using System.ComponentModel.Design;
 using Microsoft.AspNetCore.JsonPatch;
+using ProductService.ActionFilters;
 
 namespace ProductService.Controllers
 {
@@ -35,6 +36,7 @@ namespace ProductService.Controllers
         }
 
         [HttpPost]
+        [ServiceFilter(typeof(ValidationFilterAttribute))]
         public async Task<IActionResult> CreateProduct([FromBody] ProductForCreationDTO productForCreation)
         {
             var productDTO = await _service.ProductService.CreateProduct(productForCreation);
@@ -51,6 +53,7 @@ namespace ProductService.Controllers
         }
 
         [HttpPut("{id:guid}")]
+        [ServiceFilter(typeof(ValidationFilterAttribute))]
         public async Task<IActionResult> UpdateProduct(Guid id, [FromBody] ProductForUpdateDTO productForUpd)
         {
             await _service.ProductService.UpdateProduct(id, productForUpd, true);
@@ -66,6 +69,11 @@ namespace ProductService.Controllers
 
             var result = await _service.ProductService.GetProductForPatialUpdate(id, true);
             patchDoc.ApplyTo(result.productForUpd);
+
+            TryValidateModel(result.productForUpd);
+
+            if (!ModelState.IsValid)
+                return UnprocessableEntity(ModelState);
 
             await _service.ProductService.SaveChangesForPatrialUpdate(result.productForUpd, result.productEntity);
             return NoContent();
