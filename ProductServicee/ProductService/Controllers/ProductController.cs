@@ -23,5 +23,13 @@ namespace ProductService.Controllers
 
             return Ok(products);
         }
+
+        [HttpGet("{id}", Name = "ProductById")]
+        public async Task<IActionResult> GetProduct(Guid id)
+        {
+            var product = await _service.ProductService.GetProductAsync(id, false);
+
+            return Ok(product);
+        }
     }
 }
