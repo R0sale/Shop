@@ -11,6 +11,7 @@ using Contracts;
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
 using Entities.Models;
+using Entities.Exceptions;
 using System.Runtime.CompilerServices;
 
 namespace Service
@@ -18,7 +19,7 @@ namespace Service
     public class ProductService : IProductService
     {
         private readonly IProductRepository _repository;
-        private IMapper _mapper;
+        private readonly IMapper _mapper;
 
         public ProductService(IProductRepository repository, IMapper mapper)
         {
@@ -39,8 +40,7 @@ namespace Service
 
         public async Task<ProductDTO> GetProductAsync(Guid id, bool trackChanges)
         {
-            var products = await _repository.FindByCondition(p => p.Id.Equals(id), trackChanges)
-                .SingleOrDefaultAsync();
+            var products = FindAndCheckIfExistsProduct(id, trackChanges);
 
             var productsDTO = _mapper.Map<ProductDTO>(products);
 
@@ -61,7 +61,7 @@ namespace Service
 
         public async Task DeleteProduct(Guid id, bool trackChanges)
         {
-            var product = await _repository.FindByCondition(p => p.Id.Equals(id), trackChanges).SingleOrDefaultAsync();
+            var product = await FindAndCheckIfExistsProduct(id, trackChanges);
 
             _repository.DeleteProduct(product);
             await _repository.SaveProductAsync();
@@ -69,7 +69,7 @@ namespace Service
 
         public async Task UpdateProduct(Guid id, ProductForUpdateDTO productForUpd, bool trackChanges)
         {
-            var product = await _repository.FindByCondition(p => p.Id.Equals(id), trackChanges).SingleOrDefaultAsync();
+            var product = await FindAndCheckIfExistsProduct(id, trackChanges);
 
             _mapper.Map(productForUpd, product);
             await _repository.SaveProductAsync();
@@ -77,7 +77,7 @@ namespace Service
 
         public async Task<(ProductForUpdateDTO productForUpd, Product productEntity)> GetProductForPatialUpdate(Guid id, bool trackChanges)
         {
-            var product = await _repository.FindByCondition(p => p.Id.Equals(id), trackChanges).SingleOrDefaultAsync();
+            var product = await FindAndCheckIfExistsProduct(id, trackChanges);
 
             var productForUpd = _mapper.Map<ProductForUpdateDTO>(product);
 
@@ -88,6 +88,16 @@ namespace Service
         {
             _mapper.Map(productForUpd, product);
             await _repository.SaveProductAsync();
+        }
+
+        private async Task<Product> FindAndCheckIfExistsProduct(Guid id, bool trackChanges)
+        {
+            var product = await _repository.FindByCondition(p => p.Id.Equals(id), trackChanges).SingleOrDefaultAsync();
+
+            if (product is null)
+                throw new ProductNotFoundException(id);
+            
+            return product;
         }
     }
 }
