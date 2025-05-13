@@ -11,6 +11,7 @@ using Contracts;
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
 using Entities.Models;
+using System.Runtime.CompilerServices;
 
 namespace Service
 {
@@ -56,6 +57,14 @@ namespace Service
             var productDTO = _mapper.Map<ProductDTO>(product);
 
             return productDTO;
+        }
+
+        public async Task DeleteProduct(Guid id, bool trackChanges)
+        {
+            var product = await _repository.FindByCondition(p => p.Id.Equals(id), trackChanges).SingleOrDefaultAsync();
+
+            _repository.DeleteProduct(product);
+            await _repository.SaveProductAsync();
         }
     }
 }

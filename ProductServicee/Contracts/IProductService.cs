@@ -12,5 +12,6 @@ namespace Service.Contracts
         Task<IEnumerable<ProductDTO>> GetAllProductsAsync(bool trackChanges);
         Task<ProductDTO> GetProductAsync(Guid id, bool trackChanges);
         Task<ProductDTO> CreateProduct(ProductForCreationDTO productForCreation);
+        Task DeleteProduct(Guid id, bool trackChanges);
     }
 }
