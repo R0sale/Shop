@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using ProductService.Extensions;
 
@@ -10,6 +11,11 @@ builder.Services.ConfigureSqlContext(builder.Configuration);
 
 builder.Services.AddControllers()
     .AddNewtonsoftJson();
+
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.SuppressModelStateInvalidFilter = true;
+});
 
 var app = builder.Build();
 

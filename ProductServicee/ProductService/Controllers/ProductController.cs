@@ -37,6 +37,12 @@ namespace ProductService.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateProduct([FromBody] ProductForCreationDTO productForCreation)
         {
+            if (productForCreation == null)
+                return BadRequest("ProductForCreation is null");
+
+            if (!ModelState.IsValid)
+                return UnprocessableEntity(ModelState);
+
             var productDTO = await _service.ProductService.CreateProduct(productForCreation);
 
             return CreatedAtRoute("ProductById", new { id = productDTO.Id }, productDTO);
@@ -53,6 +59,12 @@ namespace ProductService.Controllers
         [HttpPut("{id:guid}")]
         public async Task<IActionResult> UpdateProduct(Guid id, [FromBody] ProductForUpdateDTO productForUpd)
         {
+            if (productForUpd == null)
+                return BadRequest("ProductForUpdate is null");
+
+            if (!ModelState.IsValid)
+                return UnprocessableEntity(ModelState);
+
             await _service.ProductService.UpdateProduct(id, productForUpd, true);
 
             return NoContent();
@@ -66,6 +78,11 @@ namespace ProductService.Controllers
 
             var result = await _service.ProductService.GetProductForPatialUpdate(id, true);
             patchDoc.ApplyTo(result.productForUpd);
+
+            TryValidateModel(result.productForUpd);
+
+            if (!ModelState.IsValid)
+                return UnprocessableEntity(ModelState);
 
             await _service.ProductService.SaveChangesForPatrialUpdate(result.productForUpd, result.productEntity);
             return NoContent();
