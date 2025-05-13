@@ -38,5 +38,13 @@ namespace ProductService.Controllers
 
             return CreatedAtRoute("ProductById", new { id = productDTO.Id }, productDTO);
         }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteProduct(Guid id)
+        {
+            await _service.ProductService.DeleteProduct(id, false);
+
+            return NoContent();
+        }
     }
 }
