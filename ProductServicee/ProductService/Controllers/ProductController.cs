@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
+using Shared.DTOObjects;
 
 namespace ProductService.Controllers
 {
@@ -30,6 +31,14 @@ namespace ProductService.Controllers
             var product = await _service.ProductService.GetProductAsync(id, false);
 
             return Ok(product);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateProduct([FromBody] ProductForCreationDTO productForCreation)
+        {
+            var productDTO = await _service.ProductService.CreateProduct(productForCreation);
+
+            return CreatedAtRoute("ProductById", new { id = productDTO.Id }, productDTO);
         }
     }
 }
