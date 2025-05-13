@@ -1,6 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Azure;
+using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
 using Shared.DTOObjects;
+using System.ComponentModel.Design;
+using Microsoft.AspNetCore.JsonPatch;
 
 namespace ProductService.Controllers
 {
@@ -52,6 +55,19 @@ namespace ProductService.Controllers
         {
             await _service.ProductService.UpdateProduct(id, productForUpd, true);
 
+            return NoContent();
+        }
+
+        [HttpPatch("{id:guid}")]
+        public async Task<IActionResult> PartiallyUpdateProduct(Guid id, [FromBody] JsonPatchDocument<ProductForUpdateDTO> patchDoc)
+        {
+            if (patchDoc == null)
+                return BadRequest();
+
+            var result = await _service.ProductService.GetProductForPatialUpdate(id, true);
+            patchDoc.ApplyTo(result.productForUpd);
+
+            await _service.ProductService.SaveChangesForPatrialUpdate(result.productForUpd, result.productEntity);
             return NoContent();
         }
     }

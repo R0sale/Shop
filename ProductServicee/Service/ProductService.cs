@@ -74,5 +74,20 @@ namespace Service
             _mapper.Map(productForUpd, product);
             await _repository.SaveProductAsync();
         }
+
+        public async Task<(ProductForUpdateDTO productForUpd, Product productEntity)> GetProductForPatialUpdate(Guid id, bool trackChanges)
+        {
+            var product = await _repository.FindByCondition(p => p.Id.Equals(id), trackChanges).SingleOrDefaultAsync();
+
+            var productForUpd = _mapper.Map<ProductForUpdateDTO>(product);
+
+            return (productForUpd, product);
+        }
+
+        public async Task SaveChangesForPatrialUpdate(ProductForUpdateDTO productForUpd, Product product)
+        {
+            _mapper.Map(productForUpd, product);
+            await _repository.SaveProductAsync();
+        }
     }
 }

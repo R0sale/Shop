@@ -1,4 +1,5 @@
-﻿using Shared.DTOObjects;
+﻿using Entities.Models;
+using Shared.DTOObjects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,5 +15,7 @@ namespace Service.Contracts
         Task<ProductDTO> CreateProduct(ProductForCreationDTO productForCreation);
         Task DeleteProduct(Guid id, bool trackChanges);
         Task UpdateProduct(Guid id, ProductForUpdateDTO productForUpd, bool trackChanges);
+        Task<(ProductForUpdateDTO productForUpd, Product productEntity)> GetProductForPatialUpdate(Guid id, bool trackChanges);
+        Task SaveChangesForPatrialUpdate(ProductForUpdateDTO productForUpd, Product product);
     }
 }
