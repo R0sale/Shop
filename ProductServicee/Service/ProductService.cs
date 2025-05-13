@@ -66,5 +66,13 @@ namespace Service
             _repository.DeleteProduct(product);
             await _repository.SaveProductAsync();
         }
+
+        public async Task UpdateProduct(Guid id, ProductForUpdateDTO productForUpd, bool trackChanges)
+        {
+            var product = await _repository.FindByCondition(p => p.Id.Equals(id), trackChanges).SingleOrDefaultAsync();
+
+            _mapper.Map(productForUpd, product);
+            await _repository.SaveProductAsync();
+        }
     }
 }
