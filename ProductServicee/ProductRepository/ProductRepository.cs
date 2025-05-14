@@ -1,50 +1,41 @@
 ﻿using Contracts;
 using Entities.Models;
 using Microsoft.EntityFrameworkCore;
+using Shared.Request;
 using System.Linq.Expressions;
 
 namespace Repository
 {
-    public class ProductRepository : IProductRepository
+    public class ProductRepository : RepositoryBase, IProductRepository
     {
-        private readonly ProductRepositoryContext _context;
-
-        public ProductRepository(ProductRepositoryContext context)
+        public ProductRepository(ProductRepositoryContext context) : base(context)
         {
-            _context = context;
         }
 
-        public IQueryable<Product> FindAll(bool trackChanges)
+        public async Task<PagedList<Product>> GetAllProducts(ProductParams productParams, bool trackChanges)
         {
-            return trackChanges ?
-                _context.Set<Product>() :
-                _context.Set<Product>().AsNoTracking();
+            var products = await FindAll(trackChanges)
+                .OrderBy(p => p.Name)
+                .ToListAsync();
+
+            return PagedList<Product>.ToPagedList(products, productParams.CurrentPage, productParams.PageSize);
         }
 
-        public IQueryable<Product> FindByCondition(Expression<Func<Product, bool>> expression, bool trackChanges)
+        public async Task<Product> GetProduct(Guid id, bool trackChanges)
         {
-            return !trackChanges ? _context.Set<Product>()
-                .Where(expression)
-                .AsNoTracking() :
-                _context.Set<Product>()
-                .Where(expression);
+            var product = await FindByCondition(p => p.Id.Equals(id), trackChanges).SingleOrDefaultAsync();
+
+            return product;
         }
 
         public void CreateProduct(Product product)
         {
-            _context.Products.Add(product);
+            CreateProduct(product);
         }
 
         public void DeleteProduct(Product product)
         {
-            _context.Products.Remove(product);
+            DeleteProduct(product);
         }
-
-        public void UpdateProduct(Product product)
-        {
-            _context.Products.Update(product);
-        }
-
-        public async Task SaveProductAsync() => await _context.SaveChangesAsync();
     }
 }

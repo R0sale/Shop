@@ -13,6 +13,7 @@ using AutoMapper;
 using Entities.Models;
 using Entities.Exceptions;
 using System.Runtime.CompilerServices;
+using Shared.Request;
 
 namespace Service
 {
@@ -27,11 +28,9 @@ namespace Service
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<ProductDTO>> GetAllProductsAsync(bool trackChanges)
+        public async Task<IEnumerable<ProductDTO>> GetAllProductsAsync(ProductParams productParams, bool trackChanges)
         {
-            var products = await _repository.FindAll(trackChanges)
-                .OrderBy(p => p.Name)
-                .ToListAsync();
+            var products = await _repository.GetAllProducts(productParams, trackChanges);
 
             var productsDTO = _mapper.Map<IEnumerable<ProductDTO>>(products);
 
@@ -40,9 +39,9 @@ namespace Service
 
         public async Task<ProductDTO> GetProductAsync(Guid id, bool trackChanges)
         {
-            var products = FindAndCheckIfExistsProduct(id, trackChanges);
+            var product = await FindAndCheckIfExistsProduct(id, trackChanges);
 
-            var productsDTO = _mapper.Map<ProductDTO>(products);
+            var productsDTO = _mapper.Map<ProductDTO>(product);
 
             return productsDTO;
         }
@@ -52,7 +51,7 @@ namespace Service
             var product = _mapper.Map<Product>(productForCreation);
 
             _repository.CreateProduct(product);
-            await _repository.SaveProductAsync();
+            await _repository.SaveAsync();
 
             var productDTO = _mapper.Map<ProductDTO>(product);
 
@@ -64,7 +63,7 @@ namespace Service
             var product = await FindAndCheckIfExistsProduct(id, trackChanges);
 
             _repository.DeleteProduct(product);
-            await _repository.SaveProductAsync();
+            await _repository.SaveAsync();
         }
 
         public async Task UpdateProduct(Guid id, ProductForUpdateDTO productForUpd, bool trackChanges)
@@ -72,7 +71,7 @@ namespace Service
             var product = await FindAndCheckIfExistsProduct(id, trackChanges);
 
             _mapper.Map(productForUpd, product);
-            await _repository.SaveProductAsync();
+            await _repository.SaveAsync();
         }
 
         public async Task<(ProductForUpdateDTO productForUpd, Product productEntity)> GetProductForPatialUpdate(Guid id, bool trackChanges)
@@ -87,12 +86,12 @@ namespace Service
         public async Task SaveChangesForPatrialUpdate(ProductForUpdateDTO productForUpd, Product product)
         {
             _mapper.Map(productForUpd, product);
-            await _repository.SaveProductAsync();
+            await _repository.SaveAsync();
         }
 
         private async Task<Product> FindAndCheckIfExistsProduct(Guid id, bool trackChanges)
         {
-            var product = await _repository.FindByCondition(p => p.Id.Equals(id), trackChanges).SingleOrDefaultAsync();
+            var product = await _repository.GetProduct(id, trackChanges);
 
             if (product is null)
                 throw new ProductNotFoundException(id);
