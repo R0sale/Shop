@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+using ProductService.ActionFilters;
 using ProductService.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,6 +10,7 @@ builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.ConfigureServiceManager();
 builder.Services.ConfigureSqlContext(builder.Configuration);
 
+builder.Services.ConfigureValidationFilter();
 builder.Services.AddControllers()
     .AddNewtonsoftJson();
 

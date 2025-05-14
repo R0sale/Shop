@@ -17,6 +17,7 @@ namespace Repository
         {
             var products = await FindAll(trackChanges)
                 .FilterProduct(productParams.MinPrice, productParams.MaxPrice, productParams.MinCreationDate, productParams.MaxCreationDate)
+                .Search(productParams.Searchterm)
                 .OrderBy(p => p.Name)
                 .ToListAsync();
 
