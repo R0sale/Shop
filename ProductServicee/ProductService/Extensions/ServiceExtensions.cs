@@ -1,5 +1,6 @@
 ﻿using Contracts;
 using Microsoft.EntityFrameworkCore;
+using ProductService.ActionFilters;
 using Repository;
 using Service;
 using Service.Contracts;
@@ -25,5 +26,7 @@ namespace ProductService.Extensions
                 opt.UseSqlServer(configuration.GetConnectionString("sqlConnection"), b => b.MigrationsAssembly("ProductService"));
             });
         }
+
+        public static void ConfigureValidationFilter(this IServiceCollection service) => service.AddScoped<ValidationFilterAttribute>();
     }
 }

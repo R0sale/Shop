@@ -10,8 +10,8 @@ namespace ProductService.ActionFilters
 
         public void OnActionExecuting(ActionExecutingContext context)
         {
-            var action = context.ActionArguments["action"];
-            var controller = context.ActionArguments["controller"];
+            var action = context.RouteData.Values["action"];
+            var controller = context.RouteData.Values["controller"];
 
             var param = context.ActionArguments.SingleOrDefault(x => x.Value.ToString().Contains("DTO")).Value;
 
