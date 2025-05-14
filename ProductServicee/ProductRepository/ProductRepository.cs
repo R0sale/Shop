@@ -1,6 +1,7 @@
 ﻿using Contracts;
 using Entities.Models;
 using Microsoft.EntityFrameworkCore;
+using Repository.Extensions;
 using Shared.Request;
 using System.Linq.Expressions;
 
@@ -15,6 +16,7 @@ namespace Repository
         public async Task<PagedList<Product>> GetAllProducts(ProductParams productParams, bool trackChanges)
         {
             var products = await FindAll(trackChanges)
+                .FilterProduct(productParams.MinPrice, productParams.MaxPrice, productParams.MinCreationDate, productParams.MaxCreationDate)
                 .OrderBy(p => p.Name)
                 .ToListAsync();
 
