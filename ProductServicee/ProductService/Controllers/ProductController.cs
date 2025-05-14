@@ -5,6 +5,8 @@ using Shared.DTOObjects;
 using System.ComponentModel.Design;
 using Microsoft.AspNetCore.JsonPatch;
 using ProductService.ActionFilters;
+using Shared.Request;
+using System.Text.Json;
 
 namespace ProductService.Controllers
 {
@@ -20,9 +22,11 @@ namespace ProductService.Controllers
         }
 
         [HttpGet(Name = "Products")]
-        public async Task<IActionResult> GetAllProducts()
+        public async Task<IActionResult> GetAllProducts([FromQuery] ProductParams productParams)
         {
-            var products = await _service.ProductService.GetAllProductsAsync(false);
+            var products = await _service.ProductService.GetAllProductsAsync(productParams, false);
+
+            //Response.Headers.Add("X-Pagination", JsonSerializer.Serialize());
 
             return Ok(products);
         }

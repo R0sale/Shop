@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Entities.Models;
 using Shared.DTOObjects;
+using Shared.Request;
 
 namespace Inno_Shop
 {

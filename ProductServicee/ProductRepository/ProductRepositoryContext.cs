@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Entities.Models;
 using Repository.Configurations;
 using System.Reflection.Emit;
+
 namespace Repository
 {
     public class ProductRepositoryContext : DbContext

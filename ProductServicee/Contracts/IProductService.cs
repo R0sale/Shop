@@ -1,5 +1,6 @@
 ﻿using Entities.Models;
 using Shared.DTOObjects;
+using Shared.Request;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,7 @@ namespace Service.Contracts
 {
     public interface IProductService
     {
-        Task<IEnumerable<ProductDTO>> GetAllProductsAsync(bool trackChanges);
+        Task<IEnumerable<ProductDTO>> GetAllProductsAsync(ProductParams productParams, bool trackChanges);
         Task<ProductDTO> GetProductAsync(Guid id, bool trackChanges);
         Task<ProductDTO> CreateProduct(ProductForCreationDTO productForCreation);
         Task DeleteProduct(Guid id, bool trackChanges);
