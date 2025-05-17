@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Entities.Exceptions
 {
-    public abstract class NotFoundException : Exception
+    public class UserNotCorrespondException : BadRequestException
     {
-        public NotFoundException(Guid id, string item) : base($"{item} with id: {id} does not exist in the db")
+        public UserNotCorrespondException(Guid id) : base("User with id {id} dont have this product")
         { }
     }
 }

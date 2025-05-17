@@ -14,6 +14,7 @@ using Entities.Models;
 using Entities.Exceptions;
 using System.Runtime.CompilerServices;
 using Shared.Request;
+using System.Security.Claims;
 
 namespace Service
 {
@@ -64,25 +65,32 @@ namespace Service
             return productDTO;
         }
 
-        public async Task DeleteProduct(Guid id, bool trackChanges)
+        public async Task DeleteProduct(Guid id, ClaimsPrincipal User, bool trackChanges)
         {
             var product = await FindAndCheckIfExistsProduct(id, trackChanges);
+
+            await CheckValidOwner(product, User);
+
 
             _repository.DeleteProductRep(product);
             await _repository.SaveAsync();
         }
 
-        public async Task UpdateProduct(Guid id, ProductForUpdateDTO productForUpd, bool trackChanges)
+        public async Task UpdateProduct(Guid id, ProductForUpdateDTO productForUpd, ClaimsPrincipal User, bool trackChanges)
         {
             var product = await FindAndCheckIfExistsProduct(id, trackChanges);
+
+            await CheckValidOwner(product, User);
 
             _mapper.Map(productForUpd, product);
             await _repository.SaveAsync();
         }
 
-        public async Task<(ProductForUpdateDTO productForUpd, Product productEntity)> GetProductForPatialUpdate(Guid id, bool trackChanges)
+        public async Task<(ProductForUpdateDTO productForUpd, Product productEntity)> GetProductForPatialUpdate(Guid id, ClaimsPrincipal User, bool trackChanges)
         {
             var product = await FindAndCheckIfExistsProduct(id, trackChanges);
+
+            await CheckValidOwner(product, User);
 
             var productForUpd = _mapper.Map<ProductForUpdateDTO>(product);
 
@@ -103,6 +111,17 @@ namespace Service
                 throw new ProductNotFoundException(id);
             
             return product;
+        }
+
+        private async Task CheckValidOwner(Product product, ClaimsPrincipal User)
+        {
+            var owner = await _client.GetUser(product.OwnerId);
+
+            if (owner is null)
+                throw new UserNotFoundException(product.OwnerId);
+
+            if (!owner.UserName.Equals(User.Identity.Name))
+                throw new UserNotCorrespondException(owner.Id);
         }
     }
 }

@@ -21,6 +21,9 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 
 builder.Services.ConfigureHttpClient();
 
+builder.Services.ConfigureJwt(builder.Configuration);
+builder.Services.AddAuthorization();
+
 var app = builder.Build();
 
 app.ConfigureExceptionHandler();
@@ -28,6 +31,8 @@ app.ConfigureExceptionHandler();
 if (app.Environment.IsProduction())
     app.UseHsts();
 
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers();
 
