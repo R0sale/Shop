@@ -4,6 +4,7 @@ using Shared.Request;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -14,9 +15,9 @@ namespace Service.Contracts
         Task<IEnumerable<ProductDTO>> GetAllProductsAsync(ProductParams productParams, bool trackChanges);
         Task<ProductDTO> GetProductAsync(Guid id, bool trackChanges);
         Task<ProductDTO> CreateProduct(ProductForCreationDTO productForCreation);
-        Task DeleteProduct(Guid id, bool trackChanges);
-        Task UpdateProduct(Guid id, ProductForUpdateDTO productForUpd, bool trackChanges);
-        Task<(ProductForUpdateDTO productForUpd, Product productEntity)> GetProductForPatialUpdate(Guid id, bool trackChanges);
+        Task DeleteProduct(Guid id, ClaimsPrincipal User, bool trackChanges);
+        Task UpdateProduct(Guid id, ProductForUpdateDTO productForUpd, ClaimsPrincipal User, bool trackChanges);
+        Task<(ProductForUpdateDTO productForUpd, Product productEntity)> GetProductForPatialUpdate(Guid id, ClaimsPrincipal User, bool trackChanges);
         Task SaveChangesForPatrialUpdate(ProductForUpdateDTO productForUpd, Product product);
     }
 }

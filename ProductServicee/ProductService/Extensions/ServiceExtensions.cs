@@ -1,10 +1,13 @@
 ﻿using Client;
 using Contracts;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using ProductService.ActionFilters;
 using Repository;
 using Service;
 using Service.Contracts;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace ProductService.Extensions
 {
@@ -34,6 +37,32 @@ namespace ProductService.Extensions
         {
             service.AddScoped<HttpClient>();
             service.AddScoped<IHttpClient, ProductClient>();
+        }
+
+        public static void ConfigureJwt(this IServiceCollection services, IConfiguration config)
+        {
+            var jwtSettings = config.GetSection("JwtSettings");
+            var key = Environment.GetEnvironmentVariable("SECRET");
+
+            services.AddAuthentication(opts =>
+            {
+                opts.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                opts.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+
+                        ValidIssuer = jwtSettings["validIssuer"],
+                        ValidAudience = jwtSettings["validAudience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))
+                    };
+                });
         }
     }
 }

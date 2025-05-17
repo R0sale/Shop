@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Entities.Exceptions
 {
-    public class BadRequestException : Exception
+    public abstract class BadRequestException : Exception
     {
-        public BadRequestException(Guid ownerId) : base($"Owner with id: {ownerId} does not exist in the db")
+        public BadRequestException(string message) : base(message)
         { }
     }
 }
