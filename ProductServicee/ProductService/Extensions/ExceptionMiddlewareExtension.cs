@@ -16,10 +16,11 @@ namespace ProductService.Extensions
                     context.Response.ContentType = "application/json";
                     var contextFeature = context.Features.Get<IExceptionHandlerFeature>();
 
-                    if (context != null)
+                    if (contextFeature != null)
                     {
-                        context.Response.StatusCode = contextFeature switch
+                        context.Response.StatusCode = contextFeature.Error switch
                         {
+                            BadRequestException => StatusCodes.Status400BadRequest,
                             NotFoundException => StatusCodes.Status404NotFound,
                             _ => StatusCodes.Status500InternalServerError
                         };

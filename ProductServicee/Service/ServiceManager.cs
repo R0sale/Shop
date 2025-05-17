@@ -8,9 +8,9 @@ namespace Service
     {
         private readonly Lazy<IProductService> _productService;
 
-        public ServiceManager(IProductRepository productRepository, IMapper mapper)
+        public ServiceManager(IProductRepository productRepository, IMapper mapper, IHttpClient httpClient)
         {
-            _productService = new Lazy<IProductService>(() => new ProductService(productRepository, mapper));
+            _productService = new Lazy<IProductService>(() => new ProductService(productRepository, mapper, httpClient));
         }
 
         public IProductService ProductService => _productService.Value;

@@ -1,4 +1,5 @@
-﻿using Contracts;
+﻿using Client;
+using Contracts;
 using Microsoft.EntityFrameworkCore;
 using ProductService.ActionFilters;
 using Repository;
@@ -28,5 +29,11 @@ namespace ProductService.Extensions
         }
 
         public static void ConfigureValidationFilter(this IServiceCollection service) => service.AddScoped<ValidationFilterAttribute>();
+
+        public static void ConfigureHttpClient(this IServiceCollection service)
+        {
+            service.AddScoped<HttpClient>();
+            service.AddScoped<IHttpClient, ProductClient>();
+        }
     }
 }

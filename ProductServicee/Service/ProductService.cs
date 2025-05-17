@@ -21,11 +21,13 @@ namespace Service
     {
         private readonly IProductRepository _repository;
         private readonly IMapper _mapper;
+        private readonly IHttpClient _client;
 
-        public ProductService(IProductRepository repository, IMapper mapper)
+        public ProductService(IProductRepository repository, IMapper mapper, IHttpClient client)
         {
             _repository = repository;
             _mapper = mapper;
+            _client = client;
         }
 
         public async Task<IEnumerable<ProductDTO>> GetAllProductsAsync(ProductParams productParams, bool trackChanges)
@@ -49,8 +51,12 @@ namespace Service
         public async Task<ProductDTO> CreateProduct(ProductForCreationDTO productForCreation)
         {
             var product = _mapper.Map<Product>(productForCreation);
+            var owner = await _client.GetUser(productForCreation.OwnerId);
 
-            _repository.CreateProduct(product);
+            if (owner is null)
+                throw new UserNotFoundException(productForCreation.OwnerId);
+
+            _repository.CreateProductRep(product);
             await _repository.SaveAsync();
 
             var productDTO = _mapper.Map<ProductDTO>(product);
@@ -62,7 +68,7 @@ namespace Service
         {
             var product = await FindAndCheckIfExistsProduct(id, trackChanges);
 
-            _repository.DeleteProduct(product);
+            _repository.DeleteProductRep(product);
             await _repository.SaveAsync();
         }
 

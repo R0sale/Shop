@@ -31,12 +31,12 @@ namespace Repository
             return product;
         }
 
-        public void CreateProduct(Product product)
+        public void CreateProductRep(Product product)
         {
             CreateProduct(product);
         }
 
-        public void DeleteProduct(Product product)
+        public void DeleteProductRep(Product product)
         {
             DeleteProduct(product);
         }
