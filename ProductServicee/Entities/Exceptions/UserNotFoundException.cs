@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace Entities.Exceptions
 {
-    public class ProductNotFoundException : NotFoundException
+    public class UserNotFoundException : NotFoundException
     {
-        public ProductNotFoundException(Guid id) : base(id, "Product")
-        {
-        }
+        public UserNotFoundException(Guid id) : base(id, "User")
+        { }
     }
 }

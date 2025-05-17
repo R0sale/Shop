@@ -19,6 +19,8 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
     options.SuppressModelStateInvalidFilter = true;
 });
 
+builder.Services.ConfigureHttpClient();
+
 var app = builder.Build();
 
 app.ConfigureExceptionHandler();

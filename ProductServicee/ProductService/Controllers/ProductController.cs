@@ -69,7 +69,7 @@ namespace ProductService.Controllers
         public async Task<IActionResult> PartiallyUpdateProduct(Guid id, [FromBody] JsonPatchDocument<ProductForUpdateDTO> patchDoc)
         {
             if (patchDoc == null)
-                return BadRequest();
+                return BadRequest("The patchDoc is null.");
 
             var result = await _service.ProductService.GetProductForPatialUpdate(id, true);
             patchDoc.ApplyTo(result.productForUpd);

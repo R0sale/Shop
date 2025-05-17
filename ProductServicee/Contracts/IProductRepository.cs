@@ -8,8 +8,8 @@ namespace Contracts
     {
         Task<PagedList<Product>> GetAllProducts(ProductParams productParams, bool trackChanges);
         Task<Product> GetProduct(Guid id, bool trackChanges);
-        void CreateProduct(Product product);
-        void DeleteProduct(Product product);
+        void CreateProductRep(Product product);
+        void DeleteProductRep(Product product);
         Task SaveAsync();
     }
 }
