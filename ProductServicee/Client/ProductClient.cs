@@ -19,8 +19,6 @@ namespace Client
         {
             var response = await _client.GetAsync($"https://localhost:7269/api/users/{id}");
 
-            await response.EnsureSuccessOrThrow(id);
-
             var user = await response.Content.ReadFromJsonAsync<UserDTO>();
 
             return user;
