@@ -71,7 +71,6 @@ namespace Service
 
             await CheckValidOwner(product, User);
 
-
             _repository.DeleteProductRep(product);
             await _repository.SaveAsync();
         }
