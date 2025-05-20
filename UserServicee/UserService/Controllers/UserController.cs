@@ -64,6 +64,11 @@ namespace UserService.Controllers
             var result = await _service.UserService.GetUserForPatialUpdate(id);
             patchDoc.ApplyTo(result.userForUpd);
 
+            TryValidateModel(result.userForUpd);
+
+            if (!ModelState.IsValid)
+                return UnprocessableEntity(ModelState);
+
             await _service.UserService.PartiallyUpdateUser(result.userEntity, result.userForUpd);
 
             return NoContent();

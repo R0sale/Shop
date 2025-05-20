@@ -59,6 +59,14 @@ namespace UserService.Tests.IntegrationTests
         }
 
         [Fact]
+        public async Task DeleteUser_ReturnsNotFound()
+        {
+            var response = await _client.DeleteAsync("api/users/3b6e3995-056a-4c52-a65a-d419e23783");
+
+            response.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
+        }
+
+        [Fact]
         public async Task UpdateUser_ReturnsNoContent()
         {
             var dto = new UserForUpdateDTO
@@ -84,6 +92,50 @@ namespace UserService.Tests.IntegrationTests
             var user = await userResponse.Content.ReadFromJsonAsync<UserDTO>();
 
             Assert.Equal("K0rill", user.FirstName);
+        }
+
+        [Fact]
+        public async Task UpdateUser_ReturnsUnprocessableEntity_Name()
+        {
+            var dto = new UserForUpdateDTO
+            {
+                UserName = "R0sa",
+                Email = "kvusov@bk.ru",
+                FirstName = "K0rill",
+                LastName = "Vusov",
+                Roles = new List<string> { "Admin" }
+            };
+
+            var content = new StringContent(
+                JsonSerializer.Serialize(dto),
+                Encoding.UTF8,
+                "application/json");
+
+            var response = await _client.PutAsync("api/users/3b6e3995-056a-4c52-a65a-a5d419e23783", content);
+
+            response.StatusCode.Should().Be(System.Net.HttpStatusCode.UnprocessableEntity);
+        }
+
+        [Fact]
+        public async Task UpdateUser_ReturnsUnprocessableEntity_Roles()
+        {
+            var dto = new UserForUpdateDTO
+            {
+                UserName = "R0sa",
+                Email = "kvusov@bk.ru",
+                FirstName = "K0rill",
+                LastName = "Vusov",
+                Roles = new List<string> { "Vanya" }
+            };
+
+            var content = new StringContent(
+                JsonSerializer.Serialize(dto),
+                Encoding.UTF8,
+                "application/json");
+
+            var response = await _client.PutAsync("api/users/3b6e3995-056a-4c52-a65a-a5d419e23783", content);
+
+            response.StatusCode.Should().Be(System.Net.HttpStatusCode.UnprocessableEntity);
         }
 
         [Fact]
@@ -115,6 +167,31 @@ namespace UserService.Tests.IntegrationTests
             var user = await getUserResponse.Content.ReadFromJsonAsync<UserDTO>();
 
             user.FirstName.Should().Be("UpdatedName");
+        }
+
+        [Fact]
+        public async Task PartiallyUpdateUser_ReturnsUnprocessableEntity()
+        {
+            var existingUserId = "3b6e3995-056a-4c52-a65a-a5d419e23783";
+
+            var patchDoc = new[]
+            {
+                new
+                {
+                    op = "remove",
+                    path = "/firstName"
+                }
+            };
+
+            var content = new StringContent(
+                JsonSerializer.Serialize(patchDoc),
+                Encoding.UTF8,
+                "application/json-patch+json"
+            );
+
+            var response = await _client.PatchAsync($"/api/users/{existingUserId}", content);
+
+            response.StatusCode.Should().Be(HttpStatusCode.UnprocessableEntity);
         }
     }
 }
