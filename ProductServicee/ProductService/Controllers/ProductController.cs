@@ -28,8 +28,6 @@ namespace ProductService.Controllers
         {
             var products = await _service.ProductService.GetAllProductsAsync(productParams, false);
 
-            //Response.Headers.Add("X-Pagination", JsonSerializer.Serialize());
-
             return Ok(products);
         }
 

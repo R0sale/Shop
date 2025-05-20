@@ -79,9 +79,10 @@ namespace Service
         {
             var product = await FindAndCheckIfExistsProduct(id, trackChanges);
 
-            await CheckValidOwner(product, User);
-
             _mapper.Map(productForUpd, product);
+
+            await CheckValidOwner(product, User);
+            
             await _repository.SaveAsync();
         }
 
@@ -116,7 +117,7 @@ namespace Service
         {
             var owner = await _client.GetUser(product.OwnerId);
 
-            if (owner is null)
+            if (owner.UserName is null)
                 throw new UserNotFoundException(product.OwnerId);
 
             if (!owner.UserName.Equals(User.Identity.Name))

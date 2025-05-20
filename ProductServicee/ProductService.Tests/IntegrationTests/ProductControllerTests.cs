@@ -123,6 +123,16 @@ namespace ProductService.Tests.IntegrationTests
             response.StatusCode.Should().Be(System.Net.HttpStatusCode.NoContent);
         }
 
+        [Fact]
+        public async Task DeleteProduct_Returns()
+        {
+            var id = "2C13FDB2-83A5-4F1A-1829-08DD95525D58";
+
+            var response = await _client.DeleteAsync($"/api/products/{id}");
+
+            response.StatusCode.Should().Be(System.Net.HttpStatusCode.Unauthorized);
+        }
+
         //works when UserService is on.
         [Fact]
         public async Task UpdateProduct_ReturnsNoContent()
@@ -153,6 +163,89 @@ namespace ProductService.Tests.IntegrationTests
             response.StatusCode.Should().Be(System.Net.HttpStatusCode.NoContent);
         }
 
+        [Fact]
+        public async Task UpdateProduct_ReturnsUnprocessbleEntity()
+        {
+            var updProduct = new ProductForUpdateDTO
+            {
+                OwnerId = new Guid("3b6e3995-056a-4c52-a65a-a5d419e23783"),
+                Name = "Oran",
+                Description = "orange",
+                Accessibility = true,
+                Price = 2m,
+                CreationDate = new DateTime(2024, 10, 2)
+            };
+
+            var content = new StringContent(
+                JsonSerializer.Serialize(updProduct),
+                Encoding.UTF8,
+                "application/json");
+
+            var token = JwtTokenGenerator.GenerateJwt();
+            var id = "2C13FDB2-83A5-4F1A-1829-08DD95525D58";
+
+            _client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", token);
+
+            var response = await _client.PutAsync($"/api/products/{id}", content);
+
+            response.StatusCode.Should().Be(System.Net.HttpStatusCode.UnprocessableEntity);
+        }
+
+        [Fact]
+        public async Task UpdateProduct_ReturnsUnauthorized()
+        {
+            var updProduct = new ProductForUpdateDTO
+            {
+                OwnerId = new Guid("3b6e3995-056a-4c52-a65a-a5d419e23783"),
+                Name = "Oran",
+                Description = "orange",
+                Accessibility = true,
+                Price = 2m,
+                CreationDate = new DateTime(2024, 10, 2)
+            };
+
+            var content = new StringContent(
+                JsonSerializer.Serialize(updProduct),
+                Encoding.UTF8,
+                "application/json");
+
+            var id = "2C13FDB2-83A5-4F1A-1829-08DD95525D58";
+
+            var response = await _client.PutAsync($"/api/products/{id}", content);
+
+            response.StatusCode.Should().Be(System.Net.HttpStatusCode.Unauthorized);
+        }
+
+        [Fact]
+        public async Task UpdateProduct_ReturnsNotFound()
+        {
+            var updProduct = new ProductForUpdateDTO
+            {
+                OwnerId = new Guid("3e6e3985-056a-4c52-a65a-a5d419e23783"),
+                Name = "Orange",
+                Description = "orange",
+                Accessibility = true,
+                Price = 2m,
+                CreationDate = new DateTime(2024, 10, 2)
+            };
+
+            var content = new StringContent(
+                JsonSerializer.Serialize(updProduct),
+                Encoding.UTF8,
+                "application/json");
+
+            var token = JwtTokenGenerator.GenerateJwt();
+            var id = "2C13FDB2-83A5-4F1A-1829-08DD95525D58";
+
+            _client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", token);
+
+            var response = await _client.PutAsync($"/api/products/{id}", content);
+
+            response.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
+        }
+
         //works when UserService is on.
         [Fact]
         public async Task PartiallyUpdateProduct_ReturnsNoContent()
@@ -175,6 +268,25 @@ namespace ProductService.Tests.IntegrationTests
             response.StatusCode.Should().Be(HttpStatusCode.NoContent);
         }
 
-        
+        [Fact]
+        public async Task PartiallyUpdateProduct_ReturnsUnprocessableEntity()
+        {
+            var token = JwtTokenGenerator.GenerateJwt();
+            var id = "2C13FDB2-83A5-4F1A-1829-08DD95525D58";
+
+            var patchDoc = new[]
+            {
+                new { op = "replace", path = "/name", value = "uni" }
+            };
+
+            var patchContent = new StringContent(JsonSerializer.Serialize(patchDoc), Encoding.UTF8, "application/json-patch+json");
+
+            _client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", token);
+
+            var response = await _client.PatchAsync($"/api/products/{id}", patchContent);
+
+            response.StatusCode.Should().Be(HttpStatusCode.UnprocessableEntity);
+        }
     }
 }
